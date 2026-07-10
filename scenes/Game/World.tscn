@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/Game/World.gd" id="1"]
+
+[sub_resource type="BoxShape3D" id="SubResource_ground_shape"]
+size = Vector3(50, 1, 50)
+
+[sub_resource type="BoxMesh" id="SubResource_ground_mesh"]
+size = Vector3(50, 1, 50)
+
+[sub_resource type="ProceduralSkyMaterial" id="SubResource_sky_mat"]
+sky_top_color = Color(0.4, 0.6, 1.0, 1.0)
+sky_horizon_color = Color(0.7, 0.8, 1.0, 1.0)
+ground_bottom_color = Color(0.1, 0.1, 0.1, 1.0)
+ground_horizon_color = Color(0.2, 0.2, 0.25, 1.0)
+
+[sub_resource type="Sky" id="SubResource_sky"]
+sky_material = SubResource("SubResource_sky_mat")
+
+[sub_resource type="Environment" id="SubResource_env"]
+background_mode = 2
+background_sky = SubResource("SubResource_sky")
+ambient_light_source = 1
+ambient_light_color = Color(0.3, 0.3, 0.35, 1.0)
+
+[node name="World" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("SubResource_ground_shape")
+position = Vector3(0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("SubResource_ground_mesh")
+position = Vector3(0, -0.5, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+position = Vector3(0, 10, 0)
+rotation = Vector3(-0.8, 0.5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("SubResource_env")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("..")
+spawn_limit = 20
