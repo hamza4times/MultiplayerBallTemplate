@@ -6,7 +6,7 @@ signal server_disconnected
 
 const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1"
-const MAX_CONNECTIONS = 20
+const MAX_CONNECTIONS = 12
 
 var players = {}
 var player_info = {"name": "Player"}

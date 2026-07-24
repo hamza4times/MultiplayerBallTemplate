@@ -66,7 +66,7 @@ func _physics_process(delta):
 
 	send_transform.rpc(global_position, rotation.y)
 
-@rpc("unreliable", "call_local")
+@rpc("unreliable")
 func send_transform(pos: Vector3, rot_y: float):
 	global_position = pos
 	rotation.y = rot_y

@@ -31,6 +31,9 @@ func start_game():
 	game_started = true
 	spawn_all_players()
 
+const SPAWN_RADIUS := 5.0
+const SPAWN_HEIGHT := 1.0
+
 func _spawn_player(data):
 	var peer_id = data as int
 	var player = player_scene.instantiate()
@@ -42,7 +45,9 @@ func _spawn_player(data):
 	player.update_name_label(player.player_name)
 	var keys = Lobby.players.keys()
 	var idx = keys.find(peer_id)
-	player.position = Vector3(idx * 2.5 - 1.25, 0.5, 0)
+	var total = keys.size()
+	var angle = idx * (TAU / total)
+	player.position = Vector3(sin(angle) * SPAWN_RADIUS, SPAWN_HEIGHT, cos(angle) * SPAWN_RADIUS)
 	return player
 
 func spawn_all_players():
