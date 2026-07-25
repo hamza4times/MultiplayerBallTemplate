@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/Menu/Menu.gd" id="1"]
+
+[sub_resource type="SphereMesh" id="SubResource_preview_mesh"]
+radius = 0.5
+height = 1.0
 
 [node name="Menu" type="Control"]
 script = ExtResource("1")
@@ -8,50 +12,93 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -175.0
-offset_top = -200.0
-offset_right = 175.0
-offset_bottom = 200.0
+[node name="TabContainer" type="TabContainer" parent="."]
+anchors_preset = 0
+offset_left = 20
+offset_top = 20
+offset_right = -20
+offset_bottom = -20
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="Play" type="VBoxContainer" parent="TabContainer"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+
+[node name="Title" type="Label" parent="TabContainer/Play"]
 text = "MULTIPLAYER TAG"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 28
 
-[node name="NameInput" type="LineEdit" parent="VBoxContainer"]
+[node name="NameInput" type="LineEdit" parent="TabContainer/Play"]
 placeholder_text = "Enter your name"
 size_flags_horizontal = 3
 
-[node name="HostButton" type="Button" parent="VBoxContainer"]
+[node name="HostButton" type="Button" parent="TabContainer/Play"]
 text = "Host Game"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Play"]
 
-[node name="IPInput" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
+[node name="IPInput" type="LineEdit" parent="TabContainer/Play/HBoxContainer"]
 placeholder_text = "Server IP (127.0.0.1)"
 size_flags_horizontal = 3
 
-[node name="JoinButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="JoinButton" type="Button" parent="TabContainer/Play/HBoxContainer"]
 text = "Join"
 
-[node name="PlayerList" type="Label" parent="VBoxContainer"]
+[node name="PlayerList" type="Label" parent="TabContainer/Play"]
 text = ""
 vertical_alignment = 1
 
-[node name="StartButton" type="Button" parent="VBoxContainer"]
+[node name="StartButton" type="Button" parent="TabContainer/Play"]
 text = "Start Game"
 
-[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="TabContainer/Play"]
 text = "Enter a name, then host or join a game"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="pressed" from="VBoxContainer/HostButton" to="." method="_on_host_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/JoinButton" to="." method="_on_join_pressed"]
-[connection signal="pressed" from="VBoxContainer/StartButton" to="." method="_on_start_pressed"]
+[node name="Locker" type="VBoxContainer" parent="TabContainer"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+theme_override_constants/separation = 12
+
+[node name="PreviewArea" type="HBoxContainer" parent="TabContainer/Locker"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="TabContainer/Locker/PreviewArea"]
+custom_minimum_size = Vector2(250, 250)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="TabContainer/Locker/PreviewArea/SubViewportContainer"]
+size = Vector2(250, 250)
+disable_2d = true
+transparent_bg = true
+
+[node name="Camera3D" type="Camera3D" parent="TabContainer/Locker/PreviewArea/SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 2)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="TabContainer/Locker/PreviewArea/SubViewportContainer/SubViewport"]
+transform = Transform3D(0.70710677, -0.40824828, 0.57735026, 0, 0.81649655, 0.57735026, -0.70710677, -0.40824828, 0.57735026, 0, 5, 0)
+
+[node name="PreviewMesh" type="MeshInstance3D" parent="TabContainer/Locker/PreviewArea/SubViewportContainer/SubViewport"]
+mesh = SubResource("SubResource_preview_mesh")
+
+[node name="ColorButtons" type="VBoxContainer" parent="TabContainer/Locker/PreviewArea"]
+alignment = 1
+
+[node name="SaveContainer" type="HBoxContainer" parent="TabContainer/Locker"]
+alignment = 1
+
+[node name="SaveButton" type="Button" parent="TabContainer/Locker/SaveContainer"]
+text = "Save Color"
+
+[connection signal="pressed" from="TabContainer/Play/HostButton" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="TabContainer/Play/HBoxContainer/JoinButton" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="TabContainer/Play/StartButton" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="TabContainer/Locker/SaveContainer/SaveButton" to="." method="_on_save_pressed"]

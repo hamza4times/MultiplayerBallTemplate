@@ -18,6 +18,28 @@ Godot 4.6 project — "Multiplayer Tag", a high-level multiplayer (HLAPI) demo w
 - **Player** — `CharacterBody3D` with camera attached to `SpringArm3D`; movement via WASD (custom InputMap actions registered by `Lobby._setup_inputs`); `send_transform.rpc("unreliable")` for position sync
 - **GameUI** — `CanvasLayer` child of World; shows who is "IT" and player list
 
+## Lobby / Locker
+
+- **Menu** now uses a `TabContainer` (2 tabs: "Play", "Locker").
+  - `Play` tab: original host/join UI.
+  - `Locker` tab: 3D character preview (`SubViewportContainer` → `SubViewport` → `Camera3D` + `MeshInstance3D` sphere) on the left; 7 color‑preset buttons on the right; Save button at bottom.
+- Color is stored to `user://player_data.cfg` via `FileAccess.store_var()` / `get_var()`.
+- `Lobby.player_info` now includes key `"color"` alongside `"name"`. It is transmitted automatically through the existing `register_me` / `_add_player` RPCs — no additional networking code.
+- Saved color is loaded by `Lobby.load_player_data()` on `_ready()`, so it persists across sessions.
+- Color can only be changed before hosting/joining (pre‑game only).
+
+## Tag indicator
+
+- Instead of turning the player red, the "it" player gets a red torus‑mesh crown (`TorusMesh` with `inner_radius=0.25`, `outer_radius=0.35`) positioned at `(0, 0.75, 0)` above the sphere.
+- The crown is hidden by default and toggled via `set_it()` → `halo.visible = value`.
+- A `_process(delta)` loop rotates the crown at `2.0 rad/s` when visible (runs on every peer, not just authority).
+- The node is declared in `Player.tscn` as `Halo` (a `MeshInstance3D` child).
+
+## Color application
+
+- `Player._ready()` reads `Lobby.players.get(peer_id, {}).get("color", Lobby.COLORS["Blue"])` and applies it to the mesh material.
+- Since `Lobby.players` is populated on all peers before `spawn_all_players()`, the color is correctly applied for every player on every machine.
+
 ## Networking model
 
 - ENet via `ENetMultiplayerPeer` (TCP-like reliability, UDP transport)
@@ -41,6 +63,7 @@ Godot 4.6 project — "Multiplayer Tag", a high-level multiplayer (HLAPI) demo w
 - `_contact_state` dictionary on World tracks tag contact per unordered peer pair to avoid re-tagging on consecutive frames
 - Players are spawned with `set_multiplayer_authority(peer_id)`, so client input and `is_multiplayer_authority()` checks work per-player
 - Directory `.godot/` is gitignored; import caches, shader caches, and editor metadata are local-only
+- `Lobby.COLORS` is a `Dictionary` with insertion order (Red, Orange, Yellow, Green, Blue, Purple, Pink). Iteration order is stable in Godot 4.x.
 
 ## What not to touch
 

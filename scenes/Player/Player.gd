@@ -2,6 +2,7 @@ extends CharacterBody3D
 class_name Player
 
 @export var speed := 8.0
+@export var jump_velocity := 6.0
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var mouse_sensitivity := 0.002
 
@@ -17,15 +18,22 @@ var material: StandardMaterial3D
 @onready var spring_arm: SpringArm3D = $SpringArm3D
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 @onready var camera: Camera3D = $SpringArm3D/Camera3D
+@onready var halo: MeshInstance3D = $Halo
 
 func _ready():
+	floor_snap_length = 0.5
 	if is_multiplayer_authority():
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		camera.current = true
 
 	material = StandardMaterial3D.new()
-	material.albedo_color = Color(0.2, 0.5, 1.0)
+	var saved_color = Lobby.players.get(peer_id, {}).get("color", Lobby.COLORS["Blue"])
+	material.albedo_color = saved_color
 	mesh_instance.material_override = material
+
+func _process(delta):
+	if halo and halo.visible:
+		halo.rotate_y(delta * 2.0)
 
 func _input(event):
 	if not is_multiplayer_authority():
@@ -57,6 +65,9 @@ func _physics_process(delta):
 	velocity.x = move_toward(velocity.x, 0, speed) if not direction else velocity.x
 	velocity.z = move_toward(velocity.z, 0, speed) if not direction else velocity.z
 
+	if is_on_floor() and Input.is_action_just_pressed("jump"):
+		velocity.y = jump_velocity
+
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
@@ -73,7 +84,7 @@ func send_transform(pos: Vector3, rot_y: float):
 
 func set_it(value: bool):
 	is_it = value
-	material.albedo_color = Color.RED if value else Color(0.2, 0.5, 1.0)
+	halo.visible = value
 
 func update_name_label(name: String):
 	player_name = name

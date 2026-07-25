@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/Player/Player.gd" id="1"]
 
@@ -9,6 +9,15 @@ radius = 0.5
 radius = 0.5
 height = 1.0
 
+[sub_resource type="TorusMesh" id="SubResource_halo_mesh"]
+inner_radius = 0.25
+outer_radius = 0.35
+rings = 16
+ring_rings = 8
+
+[sub_resource type="StandardMaterial3D" id="SubResource_halo_mat"]
+albedo_color = Color(0.9, 0.15, 0.15, 1)
+
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1")
 
@@ -17,6 +26,12 @@ shape = SubResource("SubResource_collision")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SubResource_mesh")
+
+[node name="Halo" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(0, 0.75, 0)
+mesh = SubResource("SubResource_halo_mesh")
+material_override = SubResource("SubResource_halo_mat")
 
 [node name="SpringArm3D" type="SpringArm3D" parent="."]
 position = Vector3(0, 0.5, 0)

@@ -7,18 +7,47 @@ signal server_disconnected
 const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1"
 const MAX_CONNECTIONS = 12
+const SAVE_PATH := "user://player_data.cfg"
+
+const COLORS := {
+	"Red": Color(0.9, 0.15, 0.15),
+	"Orange": Color(1.0, 0.6, 0.0),
+	"Yellow": Color(1.0, 0.9, 0.1),
+	"Green": Color(0.2, 0.8, 0.2),
+	"Blue": Color(0.2, 0.5, 1.0),
+	"Purple": Color(0.6, 0.2, 0.8),
+	"Pink": Color(1.0, 0.4, 0.7),
+}
 
 var players = {}
-var player_info = {"name": "Player"}
+var player_info = {"name": "Player", "color": COLORS["Blue"]}
 var players_loaded := 0
 
 func _ready():
+	load_player_data()
 	_setup_inputs()
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_ok)
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+func save_player_color(color: Color):
+	player_info["color"] = color
+	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file:
+		file.store_var({"color": color})
+		file.close()
+
+func load_player_data():
+	if not FileAccess.file_exists(SAVE_PATH):
+		return
+	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file:
+		var data = file.get_var()
+		file.close()
+		if data is Dictionary and data.has("color"):
+			player_info["color"] = data["color"]
 
 func _setup_inputs():
 	if InputMap.has_action("move_left"):
@@ -28,6 +57,7 @@ func _setup_inputs():
 		"move_right": KEY_D,
 		"move_forward": KEY_W,
 		"move_back": KEY_S,
+		"jump": KEY_SPACE,
 	}
 	for action_name in actions:
 		InputMap.add_action(action_name)

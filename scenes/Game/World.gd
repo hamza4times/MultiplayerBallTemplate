@@ -31,7 +31,7 @@ func start_game():
 	game_started = true
 	spawn_all_players()
 
-const SPAWN_RADIUS := 5.0
+const SPAWN_RADIUS := 8.0
 const SPAWN_HEIGHT := 1.0
 
 func _spawn_player(data):
